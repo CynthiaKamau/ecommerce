@@ -38,9 +38,9 @@ CREATE TABLE "public"."product_category" (
 ALTER TABLE "public"."product_category" 
   OWNER TO "postgres";
   
-CREATE SEQUENCE product_inventory_id_seq;
-CREATE TABLE "public"."product_inventory" (
-  "id" int8 NOT NULL DEFAULT nextval('product_inventory_id_seq'::regclass),
+CREATE SEQUENCE product_stock_id_seq;
+CREATE TABLE "public"."product_stock" (
+  "id" int8 NOT NULL DEFAULT nextval('product_stock_id_seq'::regclass),
   "quantity" int8 NOT NULL,
   "status" bool NOT NULL DEFAULT true,
   "created_at" timestamp(0),
@@ -48,7 +48,7 @@ CREATE TABLE "public"."product_inventory" (
   PRIMARY KEY ("id")
 );
 
-ALTER TABLE "public"."product_inventory" 
+ALTER TABLE "public"."product_stock" 
   OWNER TO "postgres";
 
 CREATE SEQUENCE discount_id_seq;
@@ -69,23 +69,39 @@ ALTER TABLE "public"."discount"
 CREATE SEQUENCE products_id_seq;
 CREATE TABLE "public"."products" (
   "id" int8 NOT NULL DEFAULT nextval('products_id_seq'::regclass),
+  "SKU" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "name" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "description" varchar(255) COLLATE "pg_catalog"."default",
-  "price" int8 NOT NULL,
+  "unit_price" int8 NOT NULL,
   "discount_id" int8 NOT NULL,
+  "size" varchar(255) COLLATE "pg_catalog"."default",
+  "color" varchar(255) COLLATE "pg_catalog"."default",
+  "weight" varchar(255) COLLATE "pg_catalog"."default",
   "category_id" int8 NOT NULL,
-  "inventory_id" int8 NOT NULL,
+  "stock_id" int8 NOT NULL,
   "status" bool NOT NULL DEFAULT true,
   "created_at" timestamp(0),
   "updated_at" timestamp(0),
   PRIMARY KEY ("id"),
   FOREIGN KEY ("discount_id") REFERENCES "public"."discount" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
-  FOREIGN KEY ("inventory_id") REFERENCES "public"."product_inventory" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("stock_id") REFERENCES "public"."product_stock" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
   FOREIGN KEY ("category_id") REFERENCES "public"."product_category" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
 
 );
 
-ALTER TABLE "public"."products" 
+CREATE SEQUENCE product_rating_id_seq;
+CREATE TABLE "public"."product_rating" (
+  "id" int8 NOT NULL DEFAULT nextval('product_rating_id_seq'::regclass),
+  "product_id" int8 NOT NULL,
+  "rating" int8 NOT NULL,
+  "created_at" timestamp(0),
+  "updated_at" timestamp(0),
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("product_id") REFERENCES "public"."products" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
+
+);
+
+ALTER TABLE "public"."product_rating" 
   OWNER TO "postgres";
 
 CREATE SEQUENCE users_id_seq;
@@ -224,5 +240,31 @@ CREATE TABLE "public"."order_items" (
 
 ALTER TABLE "public"."order_items" 
   OWNER TO "postgres";
+
+CREATE SEQUENCE suppliers_id_seq;
+CREATE TABLE "public"."suppliers" (
+  "id" int8 NOT NULL DEFAULT nextval('suppliers_id_seq'::regclass),
+  "name" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "contact_person" varchar(255) COLLATE "pg_catalog"."default",
+  "email" varchar(255) COLLATE "pg_catalog"."default",
+  "phone_number" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "address" varchar(255) COLLATE "pg_catalog"."default",
+  "status" bool NOT NULL DEFAULT true,
+  "created_by" int8,
+  "updated_by" int8,
+  "deleted_by" int8,
+  "restored_by" int8,
+  "created_at" timestamp(0),
+  "updated_at" timestamp(0),
+  "deleted_at" timestamp(0),
+  "restored_at" timestamp(0),
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("created_by") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("updated_by") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("deleted_by") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY ("restored_by") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  UNIQUE ("email"),
+  UNIQUE ("phone_number")
+);
 
 
