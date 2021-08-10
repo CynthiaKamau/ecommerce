@@ -1,6 +1,9 @@
-const Sequelize = require('sequelize');
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('products', {
+const sequelize = require("../dbconfig");
+const DataTypes = require('sequelize');
+
+const Product = sequelize.sequelize.define(
+  'products', 
+  {
     id: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
@@ -86,5 +89,11 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
     ]
-  });
-};
+  }
+  
+);
+
+exports.Product = Product;
+
+
+

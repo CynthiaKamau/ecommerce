@@ -17,7 +17,7 @@ const authRoute = require('./routes/auth');
 const productsRoute = require('./routes/products');
 
 //Route Middleware
-app.use('/api/user', authRoute);
-app.use('/api/',productsRoute );
+app.use('/api/auth/', authRoute);
+app.use('/api/', productsRoute );
 
 app.listen(PORT, () => console.log('Server up and running'));

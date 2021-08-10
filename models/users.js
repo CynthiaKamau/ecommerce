@@ -1,6 +1,10 @@
-const Sequelize = require('sequelize');
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('users', {
+const sequelize = require("../dbconfig");
+const DataTypes = require('sequelize');
+const Joi = require("joi");
+
+const User = sequelize.sequelize.define(
+  'users',
+  {
     id: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
@@ -130,5 +134,56 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
     ]
-  });
-};
+});
+
+function registrationValidation(user) {
+  const schema = Joi.object({
+      first_name: Joi.string()
+          .min(3)
+          .max(20)
+          .required(),
+      middle_name: Joi.string()
+          .min(3)
+          .max(20),
+      last_name: Joi.string()
+          .min(3)
+          .max(20)
+          .required(),
+      phone_number: Joi.string()
+          .max(15)
+          .min(10)
+          .required(),
+      email: Joi.string()
+          .min(5)
+          .max(255)
+          .required()
+          .email(),
+      password: Joi.string()
+          .min(6)
+          .max(255)
+          .required(),
+      role_id: Joi.number()
+  }).unknown(true);
+
+  return schema.validate(user);
+}
+
+function loginValidation(user) {
+  const schema = Joi.object({
+      phone_number: Joi.string()
+          .max(15)
+          .min(10)
+          .required(),
+      password: Joi.string()
+          .min(6)
+          .max(255)
+          .required(),
+  }).unknown(true);
+
+  return schema.validate(user);
+}
+
+exports.User = User;
+exports.registrationValidation = registrationValidation
+exports.loginValidation = loginValidation;
+
