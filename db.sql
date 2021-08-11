@@ -73,7 +73,7 @@ CREATE TABLE "public"."products" (
   "name" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "description" varchar(255) COLLATE "pg_catalog"."default",
   "unit_price" int8 NOT NULL,
-  "discount_id" int8 NOT NULL,
+  "discount_id" int8,
   "size" varchar(255) COLLATE "pg_catalog"."default",
   "color" varchar(255) COLLATE "pg_catalog"."default",
   "weight" varchar(255) COLLATE "pg_catalog"."default",

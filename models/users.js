@@ -1,5 +1,6 @@
 const sequelize = require("../dbconfig");
-const DataTypes = require('sequelize');
+const { DataTypes } = require('sequelize');
+const { Role } = require('./roles');
 const Joi = require("joi");
 
 const User = sequelize.sequelize.define(
@@ -182,6 +183,9 @@ function loginValidation(user) {
 
   return schema.validate(user);
 }
+
+User.belongsTo(Role, {foreignKey : 'role_id'})
+// Role.hasMany(User);
 
 exports.User = User;
 exports.registrationValidation = registrationValidation

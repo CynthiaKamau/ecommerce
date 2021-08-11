@@ -1,5 +1,6 @@
 const sequelize = require("../dbconfig");
-const DataTypes = require('sequelize');
+const { DataTypes } = require('sequelize');
+const { ProductCategory } = require('./product_category');
 
 const Product = sequelize.sequelize.define(
   'products', 
@@ -88,10 +89,19 @@ const Product = sequelize.sequelize.define(
           { name: "id" },
         ]
       },
+      {
+        name: "product_category_id_foreign",
+        using: "BTREE",
+        fields: [
+          { name: "category_id" },
+        ]
+      }
     ]
   }
   
 );
+
+Product.belongsTo(ProductCategory, {foreignKey : 'category_id'});
 
 exports.Product = Product;
 
