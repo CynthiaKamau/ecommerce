@@ -1,7 +1,8 @@
 const router = require('express').Router();
 const {User, loginValidation, registrationValidation} = require('../models/users');
+const { Role } = require('../models/roles');
 const bcrypt = require('bcryptjs');
-const { decode } = require('../middleware/jwt/jwt');
+const { verify } = require('../middleware/jwt/jwt');
 const jwt = require('jsonwebtoken');
 
 router.post('/register', async (req, res) => {
@@ -54,13 +55,15 @@ router.post('/login', async (req,res) => {
 
     if(!validPwd) return res.status(400).send('Invalid Password');
 
+    let role_name = await Role.findOne({ where : { id : user.role_id}, attributes : ['name'] });
+
     //create and assign token
-    const token = jwt.sign({id: user.id, phone_number: user.phone_number, email: user.email, role_id: user.role_id, first_name: user.first_name, last_name: user.last_name}, process.env.SECRET_KEY);
+    const token = jwt.sign({id: user.id, phone_number: user.phone_number, email: user.email, role_id: user.role_id, role_name: role_name.name, first_name: user.first_name, last_name: user.last_name}, process.env.SECRET_KEY);
     res.header('Authorization').send(token);
 
 });
 
-router.get('/user', decode, (req, res) => {
+router.get('/user', verify, (req, res) => {
     
     if(req.user) {
         return res.status(200).json(req.user);

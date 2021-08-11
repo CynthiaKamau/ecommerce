@@ -3,8 +3,8 @@ CREATE TABLE "public"."roles" (
   "id" int8 NOT NULL DEFAULT nextval('roles_id_seq'::regclass),
   "name" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "status" bool NOT NULL DEFAULT true,
-  "created_at" timestamp(0),
-  "updated_at" timestamp(0),
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY ("id")
 );
 
@@ -16,8 +16,8 @@ CREATE TABLE "public"."payment_methods" (
   "id" int8 NOT NULL DEFAULT nextval('payment_methods_id_seq'::regclass),
   "name" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "status" bool NOT NULL DEFAULT true,
-  "created_at" timestamp(0),
-  "updated_at" timestamp(0),
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY ("id")
 );
 
@@ -30,8 +30,8 @@ CREATE TABLE "public"."product_category" (
   "name" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "description" varchar(255) COLLATE "pg_catalog"."default",
   "status" bool NOT NULL DEFAULT true,
-  "created_at" timestamp(0),
-  "updated_at" timestamp(0),
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY ("id")
 );
 
@@ -43,8 +43,8 @@ CREATE TABLE "public"."product_stock" (
   "id" int8 NOT NULL DEFAULT nextval('product_stock_id_seq'::regclass),
   "quantity" int8 NOT NULL,
   "status" bool NOT NULL DEFAULT true,
-  "created_at" timestamp(0),
-  "updated_at" timestamp(0),
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY ("id")
 );
 
@@ -58,8 +58,8 @@ CREATE TABLE "public"."discount" (
   "description" varchar(255) COLLATE "pg_catalog"."default",
   "percentage" float(8) NOT NULL,
   "status" bool NOT NULL DEFAULT true,
-  "created_at" timestamp(0),
-  "updated_at" timestamp(0),
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY ("id")
 );
 
@@ -80,22 +80,26 @@ CREATE TABLE "public"."products" (
   "category_id" int8 NOT NULL,
   "stock_id" int8 NOT NULL,
   "status" bool NOT NULL DEFAULT true,
-  "created_at" timestamp(0),
-  "updated_at" timestamp(0),
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY ("id"),
   FOREIGN KEY ("discount_id") REFERENCES "public"."discount" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
   FOREIGN KEY ("stock_id") REFERENCES "public"."product_stock" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
-  FOREIGN KEY ("category_id") REFERENCES "public"."product_category" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
+  FOREIGN KEY ("category_id") REFERENCES "public"."product_category" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+  UNIQUE("SKU"),
+  UNIQUE("name")
 
 );
+ALTER TABLE "public"."products" 
+  OWNER TO "postgres";
 
 CREATE SEQUENCE product_rating_id_seq;
 CREATE TABLE "public"."product_rating" (
   "id" int8 NOT NULL DEFAULT nextval('product_rating_id_seq'::regclass),
   "product_id" int8 NOT NULL,
   "rating" int8 NOT NULL,
-  "created_at" timestamp(0),
-  "updated_at" timestamp(0),
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY ("id"),
   FOREIGN KEY ("product_id") REFERENCES "public"."products" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
 
@@ -121,8 +125,8 @@ CREATE TABLE "public"."users" (
   "updated_by" int8,
   "deleted_by" int8,
   "restored_by" int8,
-  "created_at" timestamp(0),
-  "updated_at" timestamp(0),
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   "deleted_at" timestamp(0),
   "restored_at" timestamp(0),
   PRIMARY KEY ("id"),
@@ -147,8 +151,8 @@ CREATE TABLE "public"."user_payment" (
   "account_no" varchar(255) COLLATE "pg_catalog"."default",
   "status" bool NOT NULL DEFAULT true,
   "expiry" timestamp(0),
-  "created_at" timestamp(0),
-  "updated_at" timestamp(0),
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY ("id"),
   FOREIGN KEY ("payment_id") REFERENCES "public"."payment_methods" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
   FOREIGN KEY ("user_id") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -163,8 +167,8 @@ CREATE TABLE "public"."shopping_session" (
   "id" int8 NOT NULL DEFAULT nextval('shopping_session_id_seq'::regclass),
   "user_id" int8 NOT NULL,
   "total" int8,
-  "created_at" timestamp(0),
-  "updated_at" timestamp(0),
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY ("id"),
   FOREIGN KEY ("user_id") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
 
@@ -179,8 +183,8 @@ CREATE TABLE "public"."cart_item" (
   "session_id" int8 NOT NULL,
   "product_id" int8 NOT NULL,
   "quantity" int8,
-  "created_at" timestamp(0),
-  "updated_at" timestamp(0),
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY ("id"),
   FOREIGN KEY ("product_id") REFERENCES "public"."products" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
   FOREIGN KEY ("session_id") REFERENCES "public"."shopping_session" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -196,8 +200,8 @@ CREATE TABLE "public"."orders" (
   "user_id" int8 NOT NULL,
   "payment_id" int8 ,
   "total" int8 NOT NULL,
-  "created_at" timestamp(0),
-  "updated_at" timestamp(0),
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY ("id"),
   FOREIGN KEY ("payment_id") REFERENCES "public"."payment_methods" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
   FOREIGN KEY ("user_id") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -214,8 +218,8 @@ CREATE TABLE "public"."payment_details" (
   "amount" int8 NOT NULL,
   "provider" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "status" bool NOT NULL DEFAULT true,
-  "created_at" timestamp(0),
-  "updated_at" timestamp(0),
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY ("id"),
   FOREIGN KEY ("order_id") REFERENCES "public"."orders" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
 
@@ -230,8 +234,8 @@ CREATE TABLE "public"."order_items" (
   "product_id" int8 NOT NULL,
   "order_id" int8 NOT NULL,
   "quantity" int8 NOT NULL,
-  "created_at" timestamp(0),
-  "updated_at" timestamp(0),
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY ("id"),
   FOREIGN KEY ("order_id") REFERENCES "public"."orders" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
   FOREIGN KEY ("product_id") REFERENCES "public"."products" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -254,8 +258,8 @@ CREATE TABLE "public"."suppliers" (
   "updated_by" int8,
   "deleted_by" int8,
   "restored_by" int8,
-  "created_at" timestamp(0),
-  "updated_at" timestamp(0),
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   "deleted_at" timestamp(0),
   "restored_at" timestamp(0),
   PRIMARY KEY ("id"),
