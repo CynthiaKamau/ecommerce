@@ -70,6 +70,22 @@ router.get('/user', verify, (req, res) => {
     } else {
         return res.status(400).json({ error : 'An error occured'});
     }
-})
+});
+
+router.put('/update-profile', verify, async (req, res) => {
+
+    await User.update({
+        first_name : req.body.first_name, 
+        middle_name : req.body.middle_name,
+        last_name : req.body.last_name,
+        email : req.body.email,
+        phone_number : req.body.phone_number,
+        role_id : req.body.role_id,
+        status : req.body.status
+    }, { returning : true , where : { id : req.user.id }} )
+    .then(user => res.status(201).json({ message : "User profile updated successfully"}))
+    .catch(error => res.status(500).json({ error : error}));
+
+});
 
 module.exports = router;

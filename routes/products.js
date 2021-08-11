@@ -53,6 +53,20 @@ router.get('/products/:id', async (req,res) => {
 
 });
 
+// //get product by id
+router.get('/products/collection/:name', async (req,res) => {
+
+    await Product.findAndCountAll({ 
+        include: [{ model: ProductCategory,
+            required : true,
+            where : {name : req.params.name }
+        }]
+    })
+    .then(product => res.status(200).json({ data : product}) )
+    .catch(error => res.status(400).json({error : error}))
+
+});
+
 //get product by name
 router.get('/product/:name', async (req,res) => {
 
