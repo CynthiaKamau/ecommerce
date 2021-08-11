@@ -1,5 +1,6 @@
 const sequelize = require('../dbconfig');
 const { DataTypes } = require('sequelize');
+const Joi = require("joi");
 
 const Role = sequelize.sequelize.define(
   'roles',
@@ -43,5 +44,17 @@ const Role = sequelize.sequelize.define(
   ]
 });
 
+function roleValidation(role) {
+  const schema = Joi.object({
+    name: Joi.string()
+          .max(65)
+          .min(3)
+          .required()
+  }).unknown(true);
+
+  return schema.validate(role);
+}
+
 exports.Role = Role;
+exports.roleValidation = roleValidation;
 

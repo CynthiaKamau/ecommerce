@@ -1,6 +1,6 @@
 const sequelize = require("../dbconfig");
 const { DataTypes } = require('sequelize');
-const { Product } = require('./products');
+const Joi = require("joi");
 
 const ProductCategory = sequelize.sequelize.define(
   'product_category',
@@ -48,6 +48,22 @@ const ProductCategory = sequelize.sequelize.define(
   ]
 });
 
+function categoryValidation(category) {
+  const schema = Joi.object({
+    name: Joi.string()
+          .max(65)
+          .min(3)
+          .required(),
+    description: Joi.string()
+          .max(65)
+          .min(3)
+
+  }).unknown(true);
+
+  return schema.validate(category);
+}
+
 exports.ProductCategory = ProductCategory;
+exports.categoryValidation = categoryValidation;
 
 

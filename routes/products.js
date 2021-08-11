@@ -111,7 +111,7 @@ router.put('/product/:id', async (req,res) => {
         status : req.body.status
 
     }, { returning : true, where : {id : req.params.id}} )
-    .then(product => res.status(201).json({ message : 'Product updated successfuly'}))
+    .then(product => res.status(200).json({ message : 'Product updated successfuly'}))
     .catch(error => res.status(500).json({ error : error}) )
 
 });
@@ -129,29 +129,5 @@ router.delete('/product/:id', async (req,res) => {
     .catch(error => res.status(500).json({error : error}) )
  
 });
-
-router.get('/collections', async (req, res) => {
-
-    await ProductCategory.findAndCountAll()
-    .then(categories => res.json({ data : categories}))
-    .catch(error => res.status(500).json({ error: error}) )
-
-});
-
-//get collection by name
-router.get('/collection/:name', async (req,res) => {
-
-});
-
-//update collection
-router.put('/collection/:id', async (req,res) => {
-
-});
-
-//delete collection
-router.delete('/collection/:id', async (req,res) => {
-
-});
-
 
 module.exports = router;
