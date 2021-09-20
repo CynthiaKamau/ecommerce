@@ -72,19 +72,27 @@ router.get('/user', verify, (req, res) => {
     }
 });
 
-router.put('/update-profile', verify, async (req, res) => {
+router.put('/update-profile/:id', verify, async (req, res) => {
+ 
+  let user = await User.findByPk(req.params.id);
 
-    await User.update({
-        first_name : req.body.first_name, 
-        middle_name : req.body.middle_name,
-        last_name : req.body.last_name,
-        email : req.body.email,
-        phone_number : req.body.phone_number,
-        role_id : req.body.role_id,
-        status : req.body.status
-    }, { returning : true , where : { id : req.user.id }} )
-    .then(user => res.status(201).json({ message : "User profile updated successfully"}))
-    .catch(error => res.status(500).json({ error : error}));
+    if(user) {
+
+        await User.update({
+            first_name : req.body.first_name, 
+            middle_name : req.body.middle_name,
+            last_name : req.body.last_name,
+            email : req.body.email,
+            phone_number : req.body.phone_number,
+            role_id : req.body.role_id,
+            status : req.body.status
+        }, { returning : true , where : { id : req.params.id }} )
+        .then(user => res.status(201).json({ message : "User profile updated successfully"}))
+        .catch(error => res.status(500).json({ error : error}));
+
+    } else {
+        return res.status(400).json({ error : 'User not found!'})
+    }
 
 });
 
