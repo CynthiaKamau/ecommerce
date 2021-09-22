@@ -162,6 +162,24 @@ CREATE TABLE "public"."user_payment" (
 ALTER TABLE "public"."user_payment" 
   OWNER TO "postgres";
 
+CREATE SEQUENCE user_address_id_seq;
+CREATE TABLE "public"."user_address" (
+  "id" int8 NOT NULL DEFAULT nextval('user_address_id_seq'::regclass),
+  "user_id" int8 NOT NULL,
+  "latitude" int8 NOT NULL,
+  "longitude" int8 NOT NULL,
+  "name" varchar(255) COLLATE "pg_catalog"."default" ,
+  "status" bool NOT NULL DEFAULT true,
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("user_id") REFERENCES "public"."users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
+
+);
+
+ALTER TABLE "public"."user_address" 
+  OWNER TO "postgres";
+
 CREATE SEQUENCE shopping_session_id_seq;
 CREATE TABLE "public"."shopping_session" (
   "id" int8 NOT NULL DEFAULT nextval('shopping_session_id_seq'::regclass),

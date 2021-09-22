@@ -1,19 +1,35 @@
 const sequelize = require('../dbconfig');
-const { DataTypes, Sequelize } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const Joi = require("joi");
 
-const PaymentMethod = sequelize.sequelize.define(
-    'payment_methods',
-    {
+const UserAddress = sequelize.sequelize.define(
+  'user_address',
+  {
     id: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true
     },
+    user_id: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      references: {
+        model: 'users',
+        key: 'id'
+      }
+    },
+    latitude: {
+      type: DataTypes.BIGINT,
+      allowNull: false
+    },
+    longitude: {
+      type: DataTypes.BIGINT,
+      allowNull: false
+    },
     name: {
       type: DataTypes.STRING(255),
-      allowNull: false
+      allowNull: true
     },
     status: {
       type: DataTypes.BOOLEAN,
@@ -32,30 +48,19 @@ const PaymentMethod = sequelize.sequelize.define(
     }
   }, {
     sequelize,
-    tableName: 'payment_methods',
+    tableName: 'user_address',
     schema: 'public',
     timestamps: false,
     indexes: [
       {
-        name: "payment_methods_pkey",
+        name: "user_address_pkey",
         unique: true,
         fields: [
           { name: "id" },
         ]
       },
     ]
-});
+  }
+);
 
-function paymentMethodValidation(payment) {
-  const schema = Joi.object({
-    name: Joi.string()
-          .max(65)
-          .min(3)
-          .required()
-  }).unknown(true);
-
-  return schema.validate(payment);
-}
-
-exports.PaymentMethod = PaymentMethod;
-exports.paymentMethodValidation = paymentMethodValidation;
+exports.UserAddress = UserAddress;

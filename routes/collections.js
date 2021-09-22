@@ -12,15 +12,15 @@ router.get('/collections', async (req, res) => {
 });
 
 //get collection by name
-router.get('/collection/:name', async (req,res) => {
+router.get('/collection', async (req,res) => {
 
-    let collection = await ProductCategory.findOne({ where : { name : req.params.name}});
+    let collection = await ProductCategory.findOne({ where : { name : req.query.name}});
 
     if(!collection) {
         return res.status(400).send("Collection does not exist!");
     }
 
-    await ProductCategory.findOne({where : { name : req.params.name}})
+    await ProductCategory.findOne({where : { name : req.query.name}})
     .then( collection => res.status(200).json({ data : collection}))
     .catch( error => res.status(500).json({ error : error}))
 

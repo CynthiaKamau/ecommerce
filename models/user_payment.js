@@ -1,6 +1,10 @@
-const Sequelize = require('sequelize');
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('user_payment', {
+const sequelize = require('../dbconfig');
+const { DataTypes } = require('sequelize');
+const Joi = require("joi");
+
+const UserPayment = sequelize.sequelize.define(
+  'user_payment',
+  {
     id: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
@@ -42,11 +46,13 @@ module.exports = function(sequelize, DataTypes) {
     },
     created_at: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: false,
+      defaultValue: Sequelize.Sequelize.fn('now')
     },
     updated_at: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: false,
+      defaultValue: Sequelize.Sequelize.fn('now')
     }
   }, {
     sequelize,
@@ -62,5 +68,7 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
     ]
-  });
-};
+  }
+);
+
+exports.UserPayment = UserPayment;
