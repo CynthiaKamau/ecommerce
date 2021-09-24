@@ -1,6 +1,7 @@
 const sequelize = require('../dbconfig');
-const { DataTypes } = require('sequelize');
+const { DataTypes, Sequelize } = require('sequelize');
 const Joi = require("joi");
+const { required } = require('joi');
 
 const UserPayment = sequelize.sequelize.define(
   'user_payment',
@@ -71,4 +72,19 @@ const UserPayment = sequelize.sequelize.define(
   }
 );
 
+function userPaymentValidation(user_payment) {
+  const schema = Joi.object({
+    payment_id: Joi.number()
+      .required(),
+    user_id: Joi.number()
+      .required(),
+    account_no: Joi.number()
+     .required()
+
+  }).unknown(true)
+
+  return schema.validate(user_payment)
+}
+
 exports.UserPayment = UserPayment;
+exports.userPaymentValidation = userPaymentValidation;

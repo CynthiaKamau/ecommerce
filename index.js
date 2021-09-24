@@ -18,6 +18,8 @@ const productsRoute = require('./routes/products');
 const collectionRoute = require('./routes/collections');
 const roleRoute = require('./routes/roles');
 const paymentMethods = require('./routes/payment-methods');
+const userAddresses = require('./routes/user-addresses');
+const userPayments = require('./routes/user-payments');
 
 //Route Middleware
 app.use('/api/auth/', authRoute);
@@ -25,5 +27,7 @@ app.use('/api/', productsRoute);
 app.use('/api/', collectionRoute);
 app.use('/api', roleRoute);
 app.use('/api', paymentMethods);
+app.use('/api', userAddresses);
+app.use('/api', userPayments);
 
 app.listen(PORT, () => console.log('Server up and running'));

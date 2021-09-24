@@ -1,5 +1,5 @@
 const sequelize = require('../dbconfig');
-const { DataTypes } = require('sequelize');
+const { DataTypes, Sequelize } = require('sequelize');
 const Joi = require("joi");
 
 const UserAddress = sequelize.sequelize.define(
@@ -20,26 +20,26 @@ const UserAddress = sequelize.sequelize.define(
       }
     },
     latitude: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.FLOAT,
       allowNull: false
     },
     longitude: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.FLOAT,
       allowNull: false
     },
     name: {
       type: DataTypes.STRING(255),
       allowNull: true
     },
-    status: {
+    default: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: true
+      defaultValue: false
     },
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: Sequelize.Sequelize.fn('now')
+      defaultValue: Sequelize.Sequelize.fn('now') 
     },
     updated_at: {
       type: DataTypes.DATE,
@@ -63,4 +63,23 @@ const UserAddress = sequelize.sequelize.define(
   }
 );
 
+function userAddressValidation(user_address) {
+  const schema = Joi.object({
+    name: Joi.string()
+     .max(65)
+     .min(3)
+     .required(),
+    latitude: Joi.number()
+     .required(),
+    longitude: Joi.number()
+     .required(),
+    user_id: Joi.number()
+     .required()
+
+  }).unknown(true);
+
+  return schema.validate(user_address)
+}
+
 exports.UserAddress = UserAddress;
+exports.userAddressValidation = userAddressValidation
