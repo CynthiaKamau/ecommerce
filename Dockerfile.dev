@@ -1,6 +1,6 @@
 FROM node:alpine
 WORKDIR '/app/ecommerce'
-COPY package.json /app/node2
+COPY package.json /app/ecommerce
 RUN npm install
-COPY . /app/node2
+COPY . /app/ecommerce
 CMD ["npm", "run", "start"]
