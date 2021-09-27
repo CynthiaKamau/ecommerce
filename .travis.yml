@@ -7,3 +7,16 @@ before_install:
 
 script:
  - docker run ciiru/ecommerce npm run test -- -- coverage #overide the defautl command and exit when test has run 
+
+deploy:
+ provider: elasticbeanstalk
+ region: "eu-west-1"
+ app: "ecommerce"
+ env: "Docker-env"
+ bucket_name: "my_id" #s3 bucket
+ bucket_path: "ecommerce"
+ on:
+  branch: master
+ access_key_id: $AWS_ACCESS_KEY
+ secret_access_key:
+  secure: "$AWS_SECRET_KEY"
