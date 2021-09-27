@@ -1,0 +1,6 @@
+FROM node:alpine
+WORKDIR '/app/ecommerce'
+COPY package.json /app/node2
+RUN npm install
+COPY . /app/node2
+CMD ["npm", "run", "start"]
