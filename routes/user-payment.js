@@ -2,9 +2,10 @@ const router = require('express').Router();
 const { UserPayment, userPaymentValidation } = require("../models/user_payment")
 const { PaymentMethod} = require("../models/payment_methods");
 const { Op } = require('sequelize');
+const { verify } = require('../middleware/jwt/jwt');
 
 //get all user payments
-router.post('/user-payments', async (req,res) => {
+router.post('/user-payments', verify, async (req,res) => {
 
     await UserPayment.findAndCountAll({ where : {user_id : req.body.user_id}})
     .then(response => res.status(200).json({ success: true, message: response}))
@@ -12,7 +13,7 @@ router.post('/user-payments', async (req,res) => {
 })
 
 //create payment from what already exists
-router.post('/user-payment', async (req,res) => {
+router.post('/user-payment', verify, async (req,res) => {
 
     let {error} = userPaymentValidation(req.body);
 
@@ -37,7 +38,7 @@ router.post('/user-payment', async (req,res) => {
 
 //update payment from what already exists
 //pass id of previous payment method
-router.put('/user-payment/:id', async (req,res) => {
+router.put('/user-payment/:id', verify, async (req,res) => {
 
     let payment_method = PaymentMethod.findByPk(req.body.payment_id);
 
@@ -58,7 +59,7 @@ router.put('/user-payment/:id', async (req,res) => {
 
 //update payment from what already exists
 //pass id of user payment method to be deleted
-router.delete('/user-payment/:id', async (req,res) => {
+router.delete('/user-payment/:id', verify, async (req,res) => {
 
     let payment_method = await UserPayment.findByPk(req.params.id);
 

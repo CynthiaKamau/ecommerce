@@ -1,9 +1,10 @@
 const router = require ('express').Router();
 const { Product, productValidation } = require('../models/products');
 const { ProductCategory } = require('../models/product_category');
+const { verify } = require('../middleware/jwt/jwt');
 
 //get all products
-router.get('/products', async (req, res) => {
+router.get('/products', verify, async (req, res) => {
 
     await Product.findAndCountAll({ limit : 100 })
     .then(products => res.status(200).json({ data : products}))
@@ -11,7 +12,7 @@ router.get('/products', async (req, res) => {
 });
 
 //create new product
-router.post('/product', async (req,res) => {
+router.post('/product', verify, async (req,res) => {
 
     let { error } = productValidation(req.body);
 
@@ -39,7 +40,7 @@ router.post('/product', async (req,res) => {
 });
 
 // //get product by id
-router.get('/products/:id', async (req,res) => {
+router.get('/products/:id', verify, async (req,res) => {
 
     let product = await Product.findOne({ where : {id : req.params.id}} );
 
@@ -54,7 +55,7 @@ router.get('/products/:id', async (req,res) => {
 });
 
 // //get product by id
-router.get('/products/collection/:name', async (req,res) => {
+router.get('/products/collection/:name', verify, async (req,res) => {
 
     await Product.findAndCountAll({ 
         include: [{ model: ProductCategory,
@@ -68,7 +69,7 @@ router.get('/products/collection/:name', async (req,res) => {
 });
 
 //get product by name
-router.get('/product/:name', async (req,res) => {
+router.get('/product/:name', verify, async (req,res) => {
 
     let product = await Product.findOne({ where : {name : req.params.name}} );
 
@@ -83,7 +84,7 @@ router.get('/product/:name', async (req,res) => {
 });
 
 //update product
-router.put('/product/:id', async (req,res) => {
+router.put('/product/:id', verify, async (req,res) => {
 
     let { error } = productValidation(req.body);
 
@@ -117,7 +118,7 @@ router.put('/product/:id', async (req,res) => {
 });
 
 //delete product
-router.delete('/product/:id', async (req,res) => {
+router.delete('/product/:id', verify, async (req,res) => {
 
     let product = await Product.findByPk(req.params.id);
 

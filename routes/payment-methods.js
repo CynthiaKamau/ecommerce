@@ -1,9 +1,10 @@
 const router = require('express').Router();
 const {Op} = require("sequelize");
 const { PaymentMethod, paymentMethodValidation} = require("../models/payment_methods")
+const { verify } = require('../middleware/jwt/jwt');
 
 //get all payment methods
-router.get('/payment-methods', async (req,res) => {
+router.get('/payment-methods', verify, async (req,res) => {
 
     await PaymentMethod.findAndCountAll()
     .then(response => res.status(200).json({ success: true, message: response}))
@@ -11,7 +12,7 @@ router.get('/payment-methods', async (req,res) => {
 })
 
 //get payment methods by id
-router.get('/payment-method/:id', async (req, res) => {
+router.get('/payment-method/:id', verify, async (req, res) => {
 
     await PaymentMethod.findByPk(req.params.id)
     .then(response => res.status(200).json({ success: true, message: response}))
@@ -19,7 +20,7 @@ router.get('/payment-method/:id', async (req, res) => {
 })
 
 //get payment methods by name
-router.get('/payment-method', async (req, res) => {
+router.get('/payment-method', verify, async (req, res) => {
 
     await PaymentMethod.findOne({ where : { name : { [Op.iLike]: '%' + req.query.name.toLowerCase() + '%' } }})
     .then(response => res.status(200).json({ success: true, message: response}))
@@ -27,7 +28,7 @@ router.get('/payment-method', async (req, res) => {
 })
 
 //add new payment methods
-router.post('/payment-method', async (req, res) => {
+router.post('/payment-method', verify, async (req, res) => {
 
     let {error} = paymentMethodValidation(req.body);
 
@@ -44,7 +45,7 @@ router.post('/payment-method', async (req, res) => {
 })
 
 //update payment methods
-router.put('/payment-method/:id', async (req,res) => {
+router.put('/payment-method/:id', verify, async (req,res) => {
 
     let role = await PaymentMethod.findByPk(req.params.id);
 
@@ -65,7 +66,7 @@ router.put('/payment-method/:id', async (req,res) => {
 })
 
 //delete payment method
-router.delete('/payment-method/:id', async (req,res) => {
+router.delete('/payment-method/:id', verify, async (req,res) => {
 
     let method = await PaymentMethod.findByPk(req.params.id);
 

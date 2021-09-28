@@ -1,9 +1,10 @@
 
 const router = require ('express').Router();
 const { ProductCategory, categoryValidation } = require('../models/product_category');
+const { verify } = require('../middleware/jwt/jwt');
 
 //get all collections
-router.get('/collections', async (req, res) => {
+router.get('/collections', verify, async (req, res) => {
 
     await ProductCategory.findAndCountAll()
     .then(collections => res.json({ data : collections}))
@@ -12,7 +13,7 @@ router.get('/collections', async (req, res) => {
 });
 
 //get collection by name
-router.get('/collection', async (req,res) => {
+router.get('/collection', verify, async (req,res) => {
 
     let collection = await ProductCategory.findOne({ where : { name : req.query.name}});
 
@@ -27,7 +28,7 @@ router.get('/collection', async (req,res) => {
 });
 
 //createcollection
-router.post('/collection', async (req,res) => {
+router.post('/collection', verify, async (req,res) => {
 
     let {error} = categoryValidation(req.body);
 
@@ -45,7 +46,7 @@ router.post('/collection', async (req,res) => {
 });
 
 //update collection
-router.put('/collection/:id', async (req,res) => {
+router.put('/collection/:id', verify, async (req,res) => {
 
     let collection = await ProductCategory.findByPk(req.params.id);
 
@@ -64,7 +65,7 @@ router.put('/collection/:id', async (req,res) => {
 });
 
 //delete collection
-router.delete('/collection/:id', async (req,res) => {
+router.delete('/collection/:id', verify, async (req,res) => {
 
     let collection = await ProductCategory.findByPk(req.params.id);
 

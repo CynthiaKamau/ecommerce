@@ -1,9 +1,10 @@
 const router = require('express').Router();
 const { UserAddress, userAddressValidation } = require("../models/user_address")
 const { Op } = require('sequelize');
+const { verify } = require('../middleware/jwt/jwt');
 
 //get all user addresses
-router.post('/user-addresses', async (req,res) => {
+router.post('/user-addresses', verify, async (req,res) => {
 
     await UserAddress.findAndCountAll({ where : {user_id : req.body.user_id}})
     .then(response => res.status(200).json({ success: true, message: response}))
@@ -11,7 +12,7 @@ router.post('/user-addresses', async (req,res) => {
 })
 
 //create new address method
-router.post('/user-address', async (req,res) => {
+router.post('/user-address', verify, async (req,res) => {
 
     let { error} = userAddressValidation(req.body);
 
@@ -31,7 +32,7 @@ router.post('/user-address', async (req,res) => {
 
 //update address from what already exists
 //pass id of previous address method
-router.put('/user-address/:id', async (req,res) => {
+router.put('/user-address/:id', verify, async (req,res) => {
 
     let user_address = await UserAddress.findByPk(req.params.id);
 
@@ -51,7 +52,7 @@ router.put('/user-address/:id', async (req,res) => {
 })
 
 //pass id of user address to delete
-router.delete('/user-address/:id', async (req,res) => {
+router.delete('/user-address/:id', verify, async (req,res) => {
 
     let user_address = await UserAddress.findByPk(req.params.id);
 

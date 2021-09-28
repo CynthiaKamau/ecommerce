@@ -1,9 +1,10 @@
 const router = require('express').Router();
 const {Op} = require("sequelize");
 const { Role, roleValidation} = require("../models/roles")
+const { verify } = require('../middleware/jwt/jwt');
 
 //get all roles
-router.get('/roles', async (req,res) => {
+router.get('/roles', verify, async (req,res) => {
 
     await Role.findAndCountAll()
     .then(roles => res.status(200).json({ success: true, message : roles}))
@@ -11,7 +12,7 @@ router.get('/roles', async (req,res) => {
 })
 
 //get role by id
-router.get('/role/:id', async (req, res) => {
+router.get('/role/:id', verify, async (req, res) => {
 
     await Role.findByPk(req.params.id)
     .then(role => res.status(200).json({ success: true, message : role}))
@@ -19,7 +20,7 @@ router.get('/role/:id', async (req, res) => {
 })
 
 //get role by name
-router.get('/role', async (req, res) => {
+router.get('/role', verify, async (req, res) => {
 
     await Role.findOne({ where : { name : { [Op.iLike]: '%' + req.query.name.toLowerCase() + '%' } }})
     .then(role => res.status(200).json({ success: true, message : role}))
@@ -27,7 +28,7 @@ router.get('/role', async (req, res) => {
 })
 
 //add new role
-router.post('/role', async (req, res) => {
+router.post('/role', verify, async (req, res) => {
 
     let {error} = roleValidation(req.body);
 
@@ -44,7 +45,7 @@ router.post('/role', async (req, res) => {
 })
 
 //update role
-router.put('/role/:id', async (req,res) => {
+router.put('/role/:id', verify, async (req,res) => {
 
     let role = await Role.findByPk(req.params.id);
 
@@ -65,7 +66,7 @@ router.put('/role/:id', async (req,res) => {
 })
 
 //delete role
-router.delete('/role/:id', async (req,res) => {
+router.delete('/role/:id', verify, async (req,res) => {
 
     let role = await Role.findByPk(req.params.id);
 

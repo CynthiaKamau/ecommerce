@@ -96,4 +96,12 @@ router.put('/update-profile/:id', verify, async (req, res) => {
 
 });
 
+router.get('/users', verify, async (req,res) => {
+
+    await User.findAndCountAll()
+    .then(users => res.status(200).json({ success: true, message : users}))
+    .catch(error => res.status(500).json({ error : error}))
+    
+});
+
 module.exports = router;
