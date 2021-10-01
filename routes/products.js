@@ -6,9 +6,13 @@ const { verify } = require('../middleware/jwt/jwt');
 //get all products
 router.get('/products', verify, async (req, res) => {
 
-    await Product.findAndCountAll({ limit : 100 })
-    .then(products => res.status(200).json({ data : products}))
-    .catch(error => res.status(500).json({ error: error}))
+    try {
+        let products = await Product.findAndCountAll({ limit : 100 })
+        res.json({ success: true, data : products});
+    } catch (error) {
+        res.status(500).json({ success: false, error: error});
+    }
+    
 });
 
 //create new product
@@ -17,26 +21,32 @@ router.post('/product', verify, async (req,res) => {
     let { error } = productValidation(req.body);
 
     if(error) {
-        return res.status(400).send(error.details[0].message);
+        return res.status(400).json({ success: false, error: error.details[0].message});
     }
 
-    await Product.create({
-        SKU : req.body.SKU,
-        name : req.body.name,
-        description : req.body.description,
-        unit_price : req.body.unit_price,
-        discount_id : req.body.discount_id,
-        size : req.body.size,
-        color : req.body.color,
-        weight : req.body.weight,
-        category_id : req.body.category_id,
-        stock_id : req.body.stock_id,
-        status : req.body.status
-
-    })
-    .then(product => res.status(201).json({ message : 'Product created successfuly'}))
-    .catch(error => res.status(500).json({ error : error}) )
-
+    try {
+        let product = await Product.create({
+            SKU : req.body.SKU,
+            name : req.body.name,
+            description : req.body.description,
+            unit_price : req.body.unit_price,
+            discount_id : req.body.discount_id,
+            size : req.body.size,
+            color : req.body.color,
+            weight : req.body.weight,
+            category_id : req.body.category_id,
+            stock_id : req.body.stock_id,
+            status : req.body.status
+    
+        })
+        res.status(201).json({ success: true,
+            message : 'Product created successfuly',
+            product: product})
+        
+    } catch (error) {
+        res.status(500).json({ success: false, error : error})
+    }
+    
 });
 
 // //get product by id
@@ -45,41 +55,55 @@ router.get('/products/:id', verify, async (req,res) => {
     let product = await Product.findOne({ where : {id : req.params.id}} );
 
     if(!product) {
-        return res.status(400).send("The product does not exist!");
-    }    
-
-    await Product.findOne({ where : {id : req.params.id}} )
-    .then(product => res.status(200).json({ data : product}) )
-    .catch(error => res.status(400).json({error : error}))
+        return res.status(400).json({ success: false, error: "The product does not exist!"});
+    }  
+    
+    try {
+        let product =   await Product.findOne({ where : {id : req.params.id}} )
+        res.json({ success: true, data : product})  
+    } catch (error) {
+        res.status(400).json({ success: false, error : error})
+    }
 
 });
 
 // //get product by id
-router.get('/products/collection/:name', verify, async (req,res) => {
+router.post('/products/collection', verify, async (req,res) => {
 
-    await Product.findAndCountAll({ 
-        include: [{ model: ProductCategory,
-            required : true,
-            where : {name : req.params.name }
-        }]
-    })
-    .then(product => res.status(200).json({ data : product}) )
-    .catch(error => res.status(400).json({error : error}))
+    try {
+
+        let product = await Product.findAndCountAll({ 
+            include: [{ model: ProductCategory,
+                required : true,
+                where : { name : { [Op.iLike]: '%' + req.query.name.toLowerCase() + '%' } }
+            }]
+        })
+        res.json({ success: true, data : product})
+        
+    } catch (error) {
+        res.status(400).json({ success: false, error : error})
+    }
 
 });
 
 //get product by name
-router.get('/product/:name', verify, async (req,res) => {
+router.post('/product', verify, async (req,res) => {
 
-    let product = await Product.findOne({ where : {name : req.params.name}} );
+    let product = await Product.findOne({ where : { name : { [Op.iLike]: '%' + req.query.name.toLowerCase() + '%' }}})
+
 
     if(!product) {
-        return res.status(400).send("The product does not exist!");
+        return res.status(400).json({ success: false, error: "The product does not exist!"});
     }
 
-    await Product.findOne({ where : {name : req.params.name}} )
-    .then(product => res.status(200).json({ data : product}) )
-    .catch(error => res.status(400).json({error : error}))
+    try {
+
+        let product = await Product.findOne({ where : {name : req.params.name}} )
+        res.json({ success: true, data : product})
+        
+    } catch (error) {
+        res.status(400).json({ success: false, error : error}) 
+    }
     
 });
 
@@ -89,31 +113,36 @@ router.put('/product/:id', verify, async (req,res) => {
     let { error } = productValidation(req.body);
 
     if(error) {
-        return res.status(400).send(error.details[0].message);
+        return res.status(400).json({ success: false, error :error.details[0].message});
     }
 
     let product = await Product.findByPk(req.params.id);
 
     if(!product) {
-        return res.status(400).send('The product does not exist!');
+        return res.status(400).json({ success: false, error :'The product does not exist!'});
     }
 
-    await Product.update({
-        SKU : req.body.SKU,
-        name : req.body.name,
-        description : req.body.description,
-        unit_price : req.body.unit_price,
-        discount_id : req.body.discount_id,
-        size : req.body.size,
-        color : req.body.color,
-        weight : req.body.weight,
-        category_id : req.body.category_id,
-        stock_id : req.body.stock_id,
-        status : req.body.status
-
-    }, { returning : true, where : {id : req.params.id}} )
-    .then(product => res.status(200).json({ message : 'Product updated successfuly'}))
-    .catch(error => res.status(500).json({ error : error}) )
+    try {
+        let product = await Product.update({
+            SKU : req.body.SKU,
+            name : req.body.name,
+            description : req.body.description,
+            unit_price : req.body.unit_price,
+            discount_id : req.body.discount_id,
+            size : req.body.size,
+            color : req.body.color,
+            weight : req.body.weight,
+            category_id : req.body.category_id,
+            stock_id : req.body.stock_id,
+            status : req.body.status
+    
+        }, { returning : true, plain: true, where : {id : req.params.id}} )
+        res.json({ success: true,
+                   message : 'Product updated successfuly',
+                   product: product[1]})
+    } catch (error) {
+        res.status(500).json({ success: false, error : error})
+    }
 
 });
 
@@ -123,11 +152,11 @@ router.delete('/product/:id', verify, async (req,res) => {
     let product = await Product.findByPk(req.params.id);
 
     if(!product) {
-        return res.status(400).send("The product does not exist!");
+        return res.status(400).json({ success: false, error :"The product does not exist!"});
     }
 
-    product.destroy().then(response => res.status(200).json({ message : 'Product deleted successfully'}))
-    .catch(error => res.status(500).json({error : error}) )
+    product.destroy().then(response => res.status(200).json({ success: true, message : 'Product deleted successfully'}))
+    .catch(error => res.status(500).json({ success: false, error : error}) )
  
 });
 
