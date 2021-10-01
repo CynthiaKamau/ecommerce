@@ -6,25 +6,34 @@ const { verify } = require('../middleware/jwt/jwt');
 //get all roles
 router.get('/roles', verify, async (req,res) => {
 
-    await Role.findAndCountAll()
-    .then(roles => res.status(200).json({ success: true, message : roles}))
-    .catch(error => res.status(500).json({ error : error}))
+    try {
+       let roles = await Role.findAndCountAll()
+       res.json({ success: true, message : roles})
+    } catch (error) {
+        res.status(500).json({ success: false, error : error})
+    }
 })
 
 //get role by id
 router.get('/role/:id', verify, async (req, res) => {
 
-    await Role.findByPk(req.params.id)
-    .then(role => res.status(200).json({ success: true, message : role}))
-    .catch(error => res.status(500).json({ error : error}))
+    try {
+        let role = await Role.findByPk(req.params.id)
+        res.json({ success: true, message : role})
+    } catch (error) {
+        res.status(500).json({ success: false, error : error})
+    }
 })
 
 //get role by name
-router.get('/role', verify, async (req, res) => {
+router.post('/role', verify, async (req, res) => {
 
-    await Role.findOne({ where : { name : { [Op.iLike]: '%' + req.query.name.toLowerCase() + '%' } }})
-    .then(role => res.status(200).json({ success: true, message : role}))
-    .catch(error => res.status(500).json({ error : error}))
+    try {
+        let role = await Role.findOne({ where : { name : { [Op.iLike]: '%' + req.query.name.toLowerCase() + '%' } }})
+        res.json({ success: true, message : role})
+    } catch (error) {
+        res.status(500).json({ success: false, error : error})
+    }
 })
 
 //add new role
@@ -33,15 +42,18 @@ router.post('/role', verify, async (req, res) => {
     let {error} = roleValidation(req.body);
 
     if(error) {
-        return res.status(500).json({ error : error.details[0].message})
+        return res.status(500).json({ success: false, error : error.details[0].message})
     }
 
-    await Role.create({
+    try {
+      let role = await Role.create({
         name : req.body.name,
         status : req.body.status
-    }).then(response => res.status(200).json({ success: true, message : 'Role added successfully.'}))
-    .catch(error => res.status(500).json({ error : error}))
-
+      })
+     res.json({ success: true, message : 'Role added successfully.', role: role})
+    } catch (error) {
+        res.status(500).json({ success: false, error : error})
+    }
 })
 
 //update role
@@ -51,16 +63,18 @@ router.put('/role/:id', verify, async (req,res) => {
 
     if(role) {
 
-        await Role.update({
+        try {
+         let role = await Role.update({
             name : req.body.name,
             status : req.body.status
-        }, { returning : true, where : { id : req.params.id }})
-        .then(response => res.status(200).json({ success: true, message : 'Role updated successfully! '}))
-        .catch(error => res.status(500).json({ error : error}))
+        }, { returning : true, plain:true, where : { id : req.params.id }})
+            res.json({ success: true, message : 'Role updated successfully! ', role: role[1]})
+        } catch (error) {
+            res.status(500).json({ success: false, error : error})
+        }
 
     } else {
-
-        return res.status(500).json({ error : "Role does not exist! "})
+        return res.status(500).json({ success: false, error : "Role does not exist! "})
     }
 
 })
@@ -74,10 +88,10 @@ router.delete('/role/:id', verify, async (req,res) => {
 
         role.destroy()
         .then(response => res.status(200).json({ success: true, message : 'Role deleted successfully!' }))
-        .catch(error => res.status(400).json({ error : error}))
+        .catch(error => res.status(400).json({ success:false, error : error}))
 
     } else {
-        return res.status(400).json({ error : 'Role does not exist!' })
+        return res.status(400).json({ success: false, error : 'Role does not exist!' })
     }
 })
 
